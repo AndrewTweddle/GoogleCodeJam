@@ -14,35 +14,6 @@ object SolverApp extends App {
   def solve(rowCount: Int, colCount: Int, mineCount: Int): String = {
     val targetEmptySpaceCount = rowCount * colCount - mineCount
     
-    /* From initial approach based on fitting a "w x h + a" rectangle plus 0, 2 or more extra empty cells.  
-    def isValidConfiguration(height: Int, width: Int): Boolean = {
-      // assume height and width are within range...
-      val remSpaces = emptyCount - height * width
-      remSpaces match {
-        case 0 => 
-          // Not valid if only a single row in empty block, and more than 1 row in grid
-          // Similarly for the columns.
-          (height > 1 || rowCount == 1) && (width > 1 || colCount == 1) 
-        case 1 => false
-        case rem =>
-          val addRemSpacesToNextRow = (height != rowCount) {
-            
-          }
-          
-      }
-    }
-    
-    val emptyCount = rowCount * colCount - mineCount
-    val heightCandidates = (1 to rowCount).toList 
-    val candidateConfigurations = for {
-      height <- heightCandidates
-      width = floor(emptyCount / height).toInt
-      if (width <= colCount)
-      remSpaces = emptyCount - height * width
-      if remSpaces != 1
-    } yield (height, width, remSpaces)
-    */
-    
     case class Pos(x: Int, y: Int) {
       def toIndex: Int = y * colCount + x
       def isValid: Boolean = x >= 0 && y >= 0 && x < rowCount && y < colCount
