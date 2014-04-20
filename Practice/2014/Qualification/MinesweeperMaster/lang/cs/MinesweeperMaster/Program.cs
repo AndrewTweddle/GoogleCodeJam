@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace MinesweeperMaster
 {
@@ -249,18 +250,27 @@ namespace MinesweeperMaster
                 using (fsOut)
                 {
                     StreamWriter sw = new StreamWriter(fsOut, Encoding.ASCII);
-                    for (int problemNumber = 1; problemNumber <= problemCount; problemNumber++)
+                    try
                     {
-                        string problemDimensionsString = sr.ReadLine();
-                        string[] problemDimensions = problemDimensionsString.Split(' ');
-                        int rowCount = int.Parse(problemDimensions[0]);
-                        int colCount = int.Parse(problemDimensions[1]);
-                        int mineCount = int.Parse(problemDimensions[2]);
-                        string solution = Solve(rowCount, colCount, mineCount);
-                        sw.WriteLine("Case #{0}:", problemNumber);
-                        sw.Write(solution);
+                        Stopwatch swatch = Stopwatch.StartNew();
+                        for (int problemNumber = 1; problemNumber <= problemCount; problemNumber++)
+                        {
+                            string problemDimensionsString = sr.ReadLine();
+                            string[] problemDimensions = problemDimensionsString.Split(' ');
+                            int rowCount = int.Parse(problemDimensions[0]);
+                            int colCount = int.Parse(problemDimensions[1]);
+                            int mineCount = int.Parse(problemDimensions[2]);
+                            string solution = Solve(rowCount, colCount, mineCount);
+                            sw.WriteLine("Case #{0}:", problemNumber);
+                            sw.Write(solution);
+                        }
+                        swatch.Stop();
+                        Console.WriteLine("Total duration: {0}", swatch.Elapsed);
                     }
-                    sw.Flush();
+                    finally
+                    {
+                        sw.Flush();
+                    }
                 }
             }
         }
