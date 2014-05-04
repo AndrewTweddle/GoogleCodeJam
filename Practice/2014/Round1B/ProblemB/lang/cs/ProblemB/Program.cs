@@ -63,9 +63,9 @@ namespace ProblemB
             }
         }
 
-        static int CountSolutions(int a, int b, int k, int mask, int maxA, int maxB)
+        static int CountSolutions(int a, int b, int k, int mask, int maxA, int maxB, int maxK)
         {
-            if ((a > maxA) || (b > maxB))
+            if ((a > maxA) || (b > maxB) || (k > maxK))
             {
                 return 0;
             }
@@ -75,37 +75,21 @@ namespace ProblemB
                 return 1;
             }
 
-            bool isInK = (k & mask) != 0;
-            if (isInK)
-            {
-                return CountSolutions(a | mask, b | mask, k, mask >> 1, maxA, maxB);
-            }
-            else
-            {
-                int solutionsWithAMasked = CountSolutions(a | mask, b, k, mask >> 1, maxA, maxB);
-                int solutionsWithBMasked = CountSolutions(a, b | mask, k, mask >> 1, maxA, maxB);
-                int solutionsWithNeitherMasked = CountSolutions(a, b, k, mask >> 1, maxA, maxB);
-                return solutionsWithAMasked + solutionsWithBMasked + solutionsWithNeitherMasked;
-            }
+            int solutionsWithKMasked = CountSolutions(a | mask, b | mask, k | mask, mask >> 1, maxA, maxB, maxK);
+            int solutionsWithAMasked = CountSolutions(a | mask, b, k, mask >> 1, maxA, maxB, maxK);
+            int solutionsWithBMasked = CountSolutions(a, b | mask, k, mask >> 1, maxA, maxB, maxK);
+            int solutionsWithNoneMasked = CountSolutions(a, b, k, mask >> 1, maxA, maxB, maxK);
+            return solutionsWithKMasked + solutionsWithAMasked + solutionsWithBMasked + solutionsWithNoneMasked;
         }
 
         static string Solve(int maxA, int maxB, int maxK)
         {
             // NB: maxA >= maxB
             int aBits = Convert.ToString(maxA, 2).Length;
-            int solutionCount = 0;
-            for (int k = 0; k <= maxK; k++)
-            {
-                int kBits = Convert.ToString(k, 2).Length;
-                if (kBits <= aBits)
-                {
-                    // Iterate through the bits from largest to smallest:
-                    int mask = 1 << aBits;
-                    int a = 0;
-                    int b = 0;
-                    solutionCount += CountSolutions(a, b, k, mask, maxA, maxB);
-                }
-            }
+
+            // Iterate through the bits from largest to smallest:
+            int mask = 1 << aBits;
+            int solutionCount = CountSolutions(0, 0, 0, mask, maxA, maxB, maxK);
             return solutionCount.ToString();
         }
 
