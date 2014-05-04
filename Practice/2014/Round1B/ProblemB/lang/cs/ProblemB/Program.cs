@@ -96,7 +96,7 @@ namespace ProblemB
             int solutionCount = 0;
             for (int k = 0; k <= maxK; k++)
             {
-                int kBits = Convert.ToString(maxB, 2).Length;
+                int kBits = Convert.ToString(k, 2).Length;
                 if (kBits <= aBits)
                 {
                     // Iterate through the bits from largest to smallest:
