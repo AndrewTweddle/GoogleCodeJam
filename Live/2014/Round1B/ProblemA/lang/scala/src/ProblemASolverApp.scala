@@ -1,6 +1,7 @@
 import scala.io.Source
 import java.io._
 import scala.math.{round, abs}
+import scala.util.Sorting._
 
 object ProblemASolverApp extends App {
   implicit val repetitions: Int = 1
@@ -43,10 +44,17 @@ object ProblemASolverApp extends App {
         if (charCountsAndRemainders.exists(_._1 != nextChar)) {
           None  // One of the strings is missing a character
         } else {
-          val charCountsList = charCountsAndRemainders.map(_._2)
-          val sumOfCharCounts = charCountsList.foldLeft(0)(_ + _)
-          val avgCharCount = math.round(sumOfCharCounts / floatStringCount)
-          val newMoveCount = charCountsList.foldLeft(0)((mCount: Int, chCount: Int) => mCount + math.abs(chCount - avgCharCount))
+          // Use median not mean to get best target value
+          // (during the live competition I used the mean, but the median is minimal, 
+          // because if a target value is not at the median, then more than half of the numbers 
+          // will reduce their distance to the target value if we move it closer to the median).
+          // NB: If there are 2 medians, then I believe either can be used (or any value between them)
+          val sortedCharCounts = charCountsAndRemainders.map(_._2).toArray
+          quickSort(sortedCharCounts)
+          val median = sortedCharCounts(sortedCharCounts.length / 2)
+          val newMoveCount = sortedCharCounts.foldLeft(0) (
+              (mCount: Int, chCount: Int) => mCount + math.abs(chCount - median)
+          )
           val remCharLists = charCountsAndRemainders.map(_._3)
           if (remCharLists.forall(_.isEmpty)) {
             Some(moveCount + newMoveCount)
