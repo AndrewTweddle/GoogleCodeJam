@@ -1,0 +1,6 @@
+\0\A-small-attempt0.in \0\A-small-attempt0.out
+\0\B-small-attempt0.in \0\B-small-attempt0.out
+\0\C-small-attempt0.in \0\C-small-attempt0.out
+large\A-large.in large\A-large.out
+large\B-large.in large\B-large.out
+large\C-large.in large\C-large.out
