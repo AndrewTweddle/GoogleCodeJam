@@ -134,6 +134,7 @@ object ProblemBSolverApp extends App {
           val sample = strings.reduce(_ + _)
           val newCombCount = CombinationCount(sample + combCount.sampleString, count * combCount.count)
           combCountByEnd.update(end, newCombCount)
+          sameSAndE.remove(start)
        }
       }
     }
