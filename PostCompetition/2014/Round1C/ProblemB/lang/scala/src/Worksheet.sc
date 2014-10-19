@@ -70,5 +70,6 @@ object Worksheet {
   ProblemBSolverApp.combineStrings(sameSAndE, combCounts)
   combCounts                                      //> res25: scala.collection.mutable.Map[Char,ProblemBSolverApp.CombinationCount
                                                   //| ] = Map(d -> CombinationCount(abbbccyccxccd,2), f -> CombinationCount(eeeeg
-                                                  //| eef,4))
+                                                  //| eef,6))
+                                                 
 }

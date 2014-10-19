@@ -2,8 +2,11 @@ import scala.io.Source
 import java.io._
 import java.util.Scanner
 import scala.collection.mutable.Map
+import scala.collection.mutable.Set
+import scala.annotation.tailrec
 
 object ProblemBSolverApp extends App {
+  lazy val modulus: Long = 1000000007L 
   implicit val repetitions: Int = 1
 
   def time[R](block: => R)(implicit repetitions: Int): R = {
@@ -19,27 +22,34 @@ object ProblemBSolverApp extends App {
     result
   }
   
-  def factorial(n: Long): Long = {
-    if (n == 0) {
-      1
-    } else {
-      n * factorial(n-1)
+  def factorial(n: Int): Long = {
+    
+    @tailrec
+    def tailFactorial(accumulator: Long, subN: Int): Long = {
+      if (subN <= 1) {
+        accumulator
+      } else {
+        tailFactorial( (subN * accumulator) % modulus, subN - 1)
+      }
     }
+    
+    tailFactorial(1, n)
   }
   
   def checkWordHasOnlyContiguousLetters(word: List[Char]): Boolean = {
-    val charMap = Map[Char, Boolean]()
+    val charMap = Set[Char]()
     var lastChar: Char = ' '
     word.forall {
-      case ch: Char => if (lastChar == ch)
-      {
-        true
-      } else if (charMap.contains(ch)) {
-        false
-      } else {
-        charMap.update(ch, true)
-        lastChar = ch
-        true
+      case ch: Char => 
+        if (lastChar == ch)
+        {
+          true
+        } else if (charMap.contains(ch)) {
+          false
+        } else {
+          charMap += ch
+          lastChar = ch
+          true
       }
     }
   }
@@ -107,7 +117,7 @@ object ProblemBSolverApp extends App {
             // Combine the 2 strings and update the map
             val firstCombCount = combCountByEnd(start)
             val newSampleString = firstCombCount.sampleString + combCount.sampleString
-            val newCount = firstCombCount.count * combCount.count
+            val newCount = (firstCombCount.count * combCount.count) % modulus
             val newCombinedCount = CombinationCount(newSampleString, newCount)
             combCountByEnd.remove(start)
             combCountByEnd.update(end, newCombinedCount) 
@@ -186,7 +196,7 @@ object ProblemBSolverApp extends App {
       val bw = new BufferedWriter(new FileWriter(outputFile))
       try {
         time {
-          val testCaseCount = lines.next.toInt
+          val testCaseCount = lines.next().toInt
           for (testCase <- 1 to testCaseCount) {
             val stringCount = lines.next().toInt
             val line = lines.next()
@@ -195,7 +205,7 @@ object ProblemBSolverApp extends App {
             
             val sol = solution match {
               case None => "0"
-              case Some(sol) => sol % 1000000007 
+              case Some(sol) => sol % modulus 
             }
             
             bw.write(s"Case #$testCase: $sol") 
