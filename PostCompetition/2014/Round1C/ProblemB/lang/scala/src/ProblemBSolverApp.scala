@@ -22,14 +22,24 @@ object ProblemBSolverApp extends App {
     result
   }
   
+  class LongWrapper(value: Long) {
+	// A binary operator to multiply two numbers and then reduce them modulo the modulus variable
+	def *%(that: Long): Long = {
+	  ( value * that ) % modulus
+	}
+  }
+  
+  // A type-converter to allow the binary operator to be used on a long directly: 
+  implicit def longToLongWrapper(value: Long): LongWrapper = new LongWrapper(value)
+  
   def factorial(n: Int): Long = {
     
     @tailrec
-    def tailFactorial(accumulator: Long, subN: Int): Long = {
+    def tailFactorial(accumulator: Long, subN: Long): Long = {
       if (subN <= 1) {
         accumulator
       } else {
-        tailFactorial( (subN * accumulator) % modulus, subN - 1)
+        tailFactorial( subN *% accumulator, subN - 1)
       }
     }
     
@@ -117,7 +127,7 @@ object ProblemBSolverApp extends App {
             // Combine the 2 strings and update the map
             val firstCombCount = combCountByEnd(start)
             val newSampleString = firstCombCount.sampleString + combCount.sampleString
-            val newCount = (firstCombCount.count * combCount.count) % modulus
+            val newCount = firstCombCount.count *% combCount.count
             val newCombinedCount = CombinationCount(newSampleString, newCount)
             combCountByEnd.remove(start)
             combCountByEnd.update(end, newCombinedCount) 
