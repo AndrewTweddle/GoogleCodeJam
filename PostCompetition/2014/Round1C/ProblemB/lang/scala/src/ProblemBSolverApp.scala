@@ -1,8 +1,8 @@
 import scala.io.Source
 import java.io._
 import java.util.Scanner
-import scala.collection.mutable.Map
-import scala.collection.mutable.Set
+import scala.collection.immutable.Map
+import scala.collection.immutable.Set
 import scala.annotation.tailrec
 
 object ProblemBSolverApp extends App {
@@ -46,154 +46,141 @@ object ProblemBSolverApp extends App {
     tailFactorial(1, n)
   }
   
-  def checkWordHasOnlyContiguousLetters(word: List[Char]): Boolean = {
-    val charMap = Set[Char]()
-    var lastChar: Char = ' '
-    word.forall {
-      case ch: Char => 
-        if (lastChar == ch)
-        {
-          true
-        } else if (charMap.contains(ch)) {
-          false
-        } else {
-          charMap += ch
-          lastChar = ch
-          true
-      }
-    }
-  }
-  
-  def mapStringsAndCheck(strings: List[String], sameSAndE: Map[Char, List[String]], diffSAndEByStart: Map[Char, String], 
-      diffSAndEByEnd: Map[Char, String]): Boolean = {
-    strings.forall {
-      case s => {
-        val start = s(0)
-        val end = s(s.length() - 1)
-        if (start == end) {
-          if (sameSAndE.contains(start)) {
-            sameSAndE.update(start, s :: sameSAndE(start))
-          } else {
-            sameSAndE.update(start, List(s))
-          }
-          true
-        } else {
-          if (diffSAndEByStart.contains(start) || diffSAndEByEnd.contains(end))
-          {
-            false
-          } else {
-            diffSAndEByStart.update(start, s)
-            diffSAndEByEnd.update(end, s)
-            true
-          }
-        }
-      }
-    }
-  }
-  
-  case class CombinationCount(sampleString: String, count: Long)
-  
-  def calculateCombinationsFromSameStartAndEndBlocks(sameSAndE: Map[Char, List[String]], 
-    diffSAndEByEnd: Map[Char, String]): Map[Char, CombinationCount] = {
+  // A graph will be created with a Node per letter (or rather per sequence of identical letters within a set).
+  // Sets consisting of a single letter will be treated as self-edges linking the node back to itself.
+  // Sets containing one or more consecutive identical letters will contribute a node per such letter.
+  // isInternalInSet is used to track whether the sequence of identical letters occurs in the interior of a set.
+  // If so, then selfEdgeSetCount must be zero. If not, then self-edges are permissible.
+  // Only a single previous node and next node need to be tracked, since multiple indicate no feasible solution.
+  case class Node(
+    thisChar: Char,
+    selfEdgeSetCount: Int = 0, selfEdgeCharCount: Int = 0,
+    otherEdgeCharCount: Int = 0, isInternalInSet: Boolean = false, 
+    prevChar: Option[Char] = None, nextChar: Option[Char] = None) {
     
-    val result = Map[Char, CombinationCount]()
-    diffSAndEByEnd.keys.foreach {
-      case ch: Char => {
-        val startStr = diffSAndEByEnd(ch)
-        val combCount = if (sameSAndE.contains(ch)) {
-          val strings = sameSAndE(ch) 
-          val count = factorial(strings.size)
-          val sample = strings.foldLeft(startStr)(_ + _)
-          CombinationCount(sample, count)
-        } else {
-          CombinationCount(startStr, 1)
+    def getPermutationCountOfSelfEdges(): Long = factorial(selfEdgeSetCount)
+    
+    def getPermutationCountOfNodesStartingHere(graph: Map[Char, Node]): Long = {
+      val followingNodesCount = nextChar match {
+        case Some(next) => {
+          val nextNode = graph(next)
+          nextNode.getPermutationCountOfNodesStartingHere(graph)
         }
-        result.update(ch, combCount)
-      }
+        case None => 1
+      } 
+      followingNodesCount *% getPermutationCountOfSelfEdges() 
     }
-    result
   }
   
-  def tryCombineStrings(combCountByEnd: Map[Char, CombinationCount]): Boolean = {
-    val keys = combCountByEnd.keys.toList
-    var combined = false
-    keys foreach {
-      case end => {
-        // First check if contained, as it might have been combined with another string already:
-        if (combCountByEnd.contains(end)) {
-          val combCount = combCountByEnd(end)
-          val start = combCount.sampleString(0)
-          if (combCountByEnd.contains(start)) {
-            // Combine the 2 strings and update the map
-            val firstCombCount = combCountByEnd(start)
-            val newSampleString = firstCombCount.sampleString + combCount.sampleString
-            val newCount = firstCombCount.count *% combCount.count
-            val newCombinedCount = CombinationCount(newSampleString, newCount)
-            combCountByEnd.remove(start)
-            combCountByEnd.update(end, newCombinedCount) 
-            combined = true
-          } else {
-            // Do nothing as this is the start of a block
+  // A subset represents a sequence of consecutive identical characters within a set:
+  case class SubSet(thisChar: Char, charCount: Int = 1, 
+    prevChar: Option[Char] = None, nextChar: Option[Char] = None)
+  
+  def splitIntoSubSetsInReverseOrder(set: String): List[SubSet] = {
+    set.foldLeft[List[SubSet]](List.empty) { (subSets, thisChar) =>
+      subSets match {
+        case Nil => List(SubSet(thisChar))
+        case SubSet(tc, cc, pc, None) :: ss if tc == thisChar =>
+          SubSet(tc, cc+1, pc, None) :: ss
+        case SubSet(tc, cc, pc, None) :: ss =>
+          SubSet(thisChar, 1, Some(tc)) :: SubSet(tc, cc, pc, Some(thisChar)) :: ss
+      }
+    }
+  }
+  
+  def addSubSetToGraph(graphOrNone: Option[Map[Char, Node]], subset: SubSet): Option[Map[Char, Node]] = {
+    graphOrNone match {
+      case None => None  // A missing graph indicates that the problem is invalid (previously determined)
+      case Some(graph) => {
+        var node = if (graph.contains(subset.thisChar)) graph(subset.thisChar) else Node(subset.thisChar)
+        subset match {
+          case SubSet(thisChar, charCount, None, None) => 
+            // This subset represents a self-edge (a set consisting of all identical letters).
+            
+            // Check if a previous set has this char in the middle, in which case there is no solution:
+            if (node.isInternalInSet) None else {
+              node = node.copy(selfEdgeSetCount = node.selfEdgeSetCount + 1, 
+                selfEdgeCharCount = node.selfEdgeCharCount + charCount)
+              Some(graph + (thisChar -> node))
+            }
+            
+          case SubSet(thisChar, charCount, prevChar, nextChar) => { 
+            // This subset is part of a large set.
+            val hasPrevChar = prevChar != None
+            val hasNextChar = nextChar != None
+            val isInternalInSet = hasPrevChar && hasNextChar
+            
+            // Check that the node doesn't already have a next or previous node: 
+            if (hasNextChar && node.nextChar != None) None 
+            else if (hasPrevChar && node.prevChar != None) None
+            else if (isInternalInSet && node.selfEdgeSetCount > 0) None
+            else {
+              node = node.copy(otherEdgeCharCount = subset.charCount, 
+                prevChar = if (hasPrevChar) prevChar else node.prevChar, 
+                nextChar = if (hasNextChar) nextChar else node.nextChar,
+                isInternalInSet = if (isInternalInSet) true else node.isInternalInSet)
+              Some(graph + (thisChar -> node))
+            }
           }
         }
       }
     }
-    combined
   }
   
-  def fixUpRepeatingInitialBlock(sameSAndE: Map[Char, List[String]], 
-    combCountByEnd: Map[Char, CombinationCount]): Unit = {
+  def buildGraphOrNone(sets: List[String]): Option[Map[Char, Node]] = {
+    val allSubSets = sets flatMap splitIntoSubSetsInReverseOrder
+    val emptyGraph = Map[Char, Node]()
+    val emptyGraphOrNone = Some(emptyGraph)
+    val graph = allSubSets.foldLeft[Option[Map[Char, Node]]](emptyGraphOrNone)(
+      (g : Option[Map[Char, Node]], ss: SubSet) => addSubSetToGraph(g,ss)
+    )
+    graph    
+  }
+  
+  def hasCycles(graph: Map[Char, Node]): Boolean = {
+    var untraversed = graph.keySet.toSet
     
-    combCountByEnd.keys foreach {
-      case end => {
-        val combCount = combCountByEnd(end)
-        val start = combCount.sampleString(0)
-        if (sameSAndE.contains(start)) {
-          val strings = sameSAndE(start) 
-          val count = factorial(strings.size)
-          val sample = strings.reduce(_ + _)
-          val newCombCount = CombinationCount(sample + combCount.sampleString, count * combCount.count)
-          combCountByEnd.update(end, newCombCount)
-          sameSAndE.remove(start)
-       }
-      }
-    }
-  }
-  
-  def combineStrings(sameSAndE: Map[Char, List[String]], combCountByEnd: Map[Char, CombinationCount]): Unit = {
-    while (tryCombineStrings(combCountByEnd)) {}
-    fixUpRepeatingInitialBlock(sameSAndE, combCountByEnd)
-  }
-  
-  def solve(strings: List[String]): Option[Long] = {
-    if (!strings.map(_.toList).forall(checkWordHasOnlyContiguousLetters))
-    {
-      None
-    } else {
-      val sameSAndE = Map[Char, List[String]]()
-      val diffSAndEByStart = Map[Char, String]()
-      val diffSAndEByEnd = Map[Char, String]()
-      
-      val isValid = ProblemBSolverApp.mapStringsAndCheck(strings, sameSAndE, diffSAndEByStart, diffSAndEByEnd)
-      if (!isValid) {
-        None
+    def traverseCharAndTestForCycle(nextChar: Char): Boolean = {
+      if (untraversed.contains(nextChar)) {
+        untraversed = untraversed - nextChar
+        val nextNode = graph(nextChar)
+        nextNode.nextChar match {
+          case None => false
+          case Some(nextCh) => traverseCharAndTestForCycle(nextCh)
+        }
       } else {
-        val combCounts = ProblemBSolverApp.calculateCombinationsFromSameStartAndEndBlocks(sameSAndE, diffSAndEByEnd)
-        ProblemBSolverApp.combineStrings(sameSAndE, combCounts)
-        var sampleString = "";
-        val combinations = combCounts.keys.foldLeft[Long](1) {
-          case (count: Long, key: Char) => {
-            val combCount = combCounts(key)
-            sampleString = sampleString + combCount.sampleString
-            count * combCount.count
-          }
-        }
-        if (!checkWordHasOnlyContiguousLetters(sampleString.toList)) {
-          None
-        } else {
-          Some(combinations)
-        }
+        // nextChar is not in the untraversed list. 
+        // That means it's already been visited before i.e. a cycle
+        // (though this shouldn't be possible, but rather play it safe)
+        true
       }
+    }
+    
+    var charsToTraverse = graph.values.filter(_.prevChar == None).map(_.thisChar)
+    val isCycleDetected = charsToTraverse.exists(ch => traverseCharAndTestForCycle(ch))
+    if (isCycleDetected) true else {
+      // There could be a cycle Any untraversed nodes must be part of a cycle:
+      !untraversed.isEmpty
+    }
+  }
+  
+  def getValidPermutationCount(graph: Map[Char, Node]): Long = {
+    if (hasCycles(graph)) 0 else {
+	  val permutationCountsByStartChar 
+	    = graph.values
+               .filter(_.prevChar == None)  // Only consider letters which start a chain
+               .map(_.getPermutationCountOfNodesStartingHere(graph))
+      val combinedPermutationCount = permutationCountsByStartChar.reduce(_ *% _)
+      val disconnectedSubGraphCount = permutationCountsByStartChar.size
+      factorial(disconnectedSubGraphCount) *% combinedPermutationCount
+    }
+  }
+  
+  def solve(sets: List[String]): Long = {
+    val graphOrNone = buildGraphOrNone(sets)
+    graphOrNone match {
+      case None => 0
+      case Some(graph) => getValidPermutationCount(graph)
     }
   }
   
@@ -212,13 +199,7 @@ object ProblemBSolverApp extends App {
             val line = lines.next()
             val strings = line.split(" ").toList
             val solution = solve(strings)
-            
-            val sol = solution match {
-              case None => "0"
-              case Some(sol) => sol % modulus 
-            }
-            
-            bw.write(s"Case #$testCase: $sol") 
+            bw.write(s"Case #$testCase: $solution") 
             bw.newLine()
           }
         }
