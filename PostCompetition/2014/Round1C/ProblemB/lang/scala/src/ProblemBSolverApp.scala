@@ -54,8 +54,8 @@ object ProblemBSolverApp extends App {
   // Only a single previous node and next node need to be tracked, since multiple indicate no feasible solution.
   case class Node(
     thisChar: Char,
-    selfEdgeSetCount: Int = 0, selfEdgeCharCount: Int = 0,
-    otherEdgeCharCount: Int = 0, isInternalInSet: Boolean = false, 
+    selfEdgeSetCount: Int = 0, 
+    isInternalInSet: Boolean = false, 
     prevChar: Option[Char] = None, nextChar: Option[Char] = None) {
     
     def getPermutationCountOfSelfEdges(): Long = factorial(selfEdgeSetCount)
@@ -99,8 +99,7 @@ object ProblemBSolverApp extends App {
             
             // Check if a previous set has this char in the middle, in which case there is no solution:
             if (node.isInternalInSet) None else {
-              node = node.copy(selfEdgeSetCount = node.selfEdgeSetCount + 1, 
-                selfEdgeCharCount = node.selfEdgeCharCount + charCount)
+              node = node.copy(selfEdgeSetCount = node.selfEdgeSetCount + 1)
               Some(graph + (thisChar -> node))
             }
             
@@ -115,7 +114,7 @@ object ProblemBSolverApp extends App {
             else if (hasPrevChar && node.prevChar != None) None
             else if (isInternalInSet && node.selfEdgeSetCount > 0) None
             else {
-              node = node.copy(otherEdgeCharCount = subset.charCount, 
+              node = node.copy( 
                 prevChar = if (hasPrevChar) prevChar else node.prevChar, 
                 nextChar = if (hasNextChar) nextChar else node.nextChar,
                 isInternalInSet = if (isInternalInSet) true else node.isInternalInSet)
@@ -159,7 +158,7 @@ object ProblemBSolverApp extends App {
     var charsToTraverse = graph.values.filter(_.prevChar == None).map(_.thisChar)
     val isCycleDetected = charsToTraverse.exists(ch => traverseCharAndTestForCycle(ch))
     if (isCycleDetected) true else {
-      // There could be a cycle Any untraversed nodes must be part of a cycle:
+      // There could be a cycle. Any untraversed nodes must be part of a cycle:
       !untraversed.isEmpty
     }
   }
