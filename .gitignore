@@ -1,3 +1,7 @@
+# Attribution:
+# 1. Don't remember where I got the initial templates from.
+# 2. Updated for Scala, IntelliJ and Idea based on the template at https://www.gitignore.io/api/scala%2Cintellij%2Csbt
+
 #################
 ## Eclipse
 #################
@@ -30,13 +34,39 @@ local.properties
 .buildpath
 
 
+#############
+### Scala ###
+#############
+*.class
+*.log
+
+
+##############
+# sbt specific
+##############
+.cache
+.history
+.lib/
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+
+
 #################
 ## IntelliJ Idea
 #################
 
 .idea
-*.iml
 *.eml
+
+### Intellij Patch ###
+*.iml
+
+## File-based project format:
+*.iws
 
 
 #################
