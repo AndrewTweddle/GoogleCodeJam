@@ -24,7 +24,7 @@ object Master {
         println("outputFolder: defaults to match inputFolder, NB: no trailing slash")
       } else {
         val command = args(0).toLowerCase()
-        val problem = args(1).toLowerCase()
+        val problem = args(1).toUpperCase()
         val sizeCode = args(2).toLowerCase()
         val sizeName = sizeMap.getOrElse(sizeCode, sizeCode)
         val isSmall = sizeName == "small"
@@ -50,12 +50,10 @@ object Master {
         println("ERROR: input file does not exist: " + inFileName)
       } else {
         problem match {
-          /*
-          case "a"  => ProblemA.processFiles(inFileName, outFileName)
-          case "b" => ProblemB.processFiles(inFileName, outFileName)
-          case "c" => ProblemC.processFiles(inFileName, outFileName)
-          */
-          case "d" => ProblemD.processFiles(inFileName, outFileName)
+          // case "a"  => ProblemA.processFiles(inFileName, outFileName)
+          case "B" => ProblemB.processFiles(inFileName, outFileName)
+          // case "c" => ProblemC.processFiles(inFileName, outFileName)
+          case "D" => ProblemD.processFiles(inFileName, outFileName)
           case _ => throw new IllegalArgumentException(s"Unsupported problem: $problem")
         }
       }
