@@ -28,10 +28,11 @@ object Master {
         val sizeCode = args(2).toLowerCase()
         val sizeName = sizeMap.getOrElse(sizeCode, sizeCode)
         val isSmall = sizeName == "small"
+        val inFolderPos = if (isSmall) 4 else 3
         val attempt = if (isSmall && args.length > 3) args(3).toInt else 0
-        val inFolderPath = if (isSmall && args.length > 4) args(4) else if (args.length > 3) args(3) else "data"
-        val outFolderPath = if (isSmall && args.length > 5) args(5) else if (args.length > 4) args(4) else inFolderPath
-        val attemptSuffix = if (isSmall) s"-attempt$sizeName" else ""
+        val inFolderPath = if (args.length > inFolderPos) args(inFolderPos) else "data"
+        val outFolderPath = if (args.length > inFolderPos + 1) args(inFolderPos) else inFolderPath
+        val attemptSuffix = if (isSmall) s"-attempt$attempt" else ""
         val inFileName = s"$inFolderPath/$problem-$sizeName$attemptSuffix.in"
         val outFileName = s"$outFolderPath/$problem-$sizeName$attemptSuffix.out"
         command match {
