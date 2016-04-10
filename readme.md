@@ -29,6 +29,10 @@ The folder structure is primarily sub-divided by the context in which the proble
 | 2014         | Round 1B       | [A. The Repeater](https://code.google.com/codejam/contest/2994486/dashboard#s=p0)          | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2014/Round1B/ProblemA/lang/scala/src/ProblemASolverApp.scala) [Bug fix (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2014/Round1B/ProblemA/lang/scala/src/ProblemASolverApp.scala)| Bug: should use median, not mean |
 | 2014         | Round 1B       | [B. New Lottery Game](https://code.google.com/codejam/contest/2994486/dashboard#s=p1)      | [Live (C#)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2014/Round1B/ProblemB/lang/cs/ProblemB/Program.cs) [Bug fixes (C#)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2014/Round1B/ProblemB/lang/cs/ProblemB/Program.cs) [Rewrite (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2014/Round1B/ProblemB/lang/scala/src/ProblemBSolverApp.scala) | The fixed C# algorithm didn't scale to the large problem, hence the redesign and rewrite in Scala |
 | 2014         | Round 1C       | [B. Reordering Train Cars](https://code.google.com/codejam/contest/3004486/dashboard#s=p1) | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2014/Round1C/ProblemB/lang/scala/src/ProblemBSolverApp.scala) [Rewrite (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2014/Round1C/ProblemB/lang/scala/src/ProblemBSolverApp.scala) | |
+| 2016         | Qualification  | [A. Counting sheep](https://code.google.com/codejam/contest/6254486/dashboard#s=p0)        | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/ProblemA.scala) | |
+| 2016         | Qualification  | [B. Revenge of the pancakes](https://code.google.com/codejam/contest/6254486/dashboard#s=p1) | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/ProblemB.scala) | |
+| 2016         | Qualification  | [C. Coin Jam](https://code.google.com/codejam/contest/6254486/dashboard#s=p2)              | [Live (Scala) - incorrect](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/ProblemC.scala) | Small submission rejected. TODO: 2016-04-09: Work out why. |
+| 2016         | Qualification  | [D. Fractiles](https://code.google.com/codejam/contest/6254486/dashboard#s=p3)             | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/ProblemD.scala) | |
 
 
 # Performance in competition
@@ -36,3 +40,21 @@ The folder structure is primarily sub-divided by the context in which the proble
 | Competition                                         |
 | ---                                                 |
 | [2014](http://www.go-hero.net/jam/14/name/atweddle) |
+
+# Other items of interest
+
+In 2014 I used a deep folder structure for problems and their data.
+In the 2016 qualification round, I used a single data folder for the entire round.
+I also added a [Master.scala](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/Master.scala) file to make it easier to switch between problems and test files.
+This takes command line arguments for things like:
+  * the problem (A, B, C or D)
+  * problem size (s=small, l=large, t=test or a custom name)
+  * attempt number (small attempts only, defaulting to zero) 
+It generates input and output file names from these arguments and calls the appropriate solution.
+
+# Future work
+
+* Modify Master.scala to move the relevant ProblemX.scala file into the data folder, renaming it to ProblemX_{size}.scala, for easier uploading.
+* Move Master.scala and ProblemX.scala template files into a templates folder
+* Make polyglot programming easier: Write similar master files for other languages (sharing the same maven/sbt folder layout including the shared data folder)
+* Make it easier to do unit testing
