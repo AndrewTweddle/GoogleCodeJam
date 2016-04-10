@@ -50,7 +50,7 @@ object Master {
         println("ERROR: input file does not exist: " + inFileName)
       } else {
         problem match {
-          // case "A"  => ProblemA.processFiles(inFileName, outFileName)
+          case "A"  => ProblemA.processFiles(inFileName, outFileName)
           case "B" => ProblemB.processFiles(inFileName, outFileName)
           case "C" => ProblemC.processFiles(inFileName, outFileName)
           case "D" => ProblemD.processFiles(inFileName, outFileName)
