@@ -71,6 +71,16 @@ object ProblemC {
       }
       isAValidJamCoin
     }
+
+    def checkDivisors: Unit = {
+      for (base <- 2.to(10)) {
+        val divisor = divisors(base - 2)
+        val valueForBase = valuesByBase(base - 2)
+        if (valueForBase % divisor != 0) {
+          println(s"  ERROR: $base10Value has incorrect divisor $divisor in base $base ($valueForBase)")
+        }
+      }
+    }
   }
 
   def getPrimesTo(maxPrime: Int): Seq[Int] = {
@@ -148,6 +158,7 @@ object ProblemC {
       }
 
       if (jamCoin.isAValidJamCoin) {
+        jamCoin.checkDivisors
         jamCoins += jamCoin
         jamCoinCount += 1
         println(s"  $jamCoinCount of $j jam coins found!")
@@ -155,6 +166,8 @@ object ProblemC {
       i += 1
     }
     println(s"[$jamCoinCount jam coins found]")
+
+    // jamCoins.foreach(_.checkDivisors)
     jamCoins
   }
 }
