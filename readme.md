@@ -33,7 +33,9 @@ The folder structure is primarily sub-divided by the context in which the proble
 | 2016         | Qualification  | [B. Revenge of the pancakes](https://code.google.com/codejam/contest/6254486/dashboard#s=p1) | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/ProblemB.scala) | |
 | 2016         | Qualification  | [C. Coin Jam](https://code.google.com/codejam/contest/6254486/dashboard#s=p2)              | [Live (Scala) - incorrect](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/ProblemC.scala) | Small submission rejected. TODO: 2016-04-09: Work out why. |
 | 2016         | Qualification  | [D. Fractiles](https://code.google.com/codejam/contest/6254486/dashboard#s=p3)             | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/ProblemD.scala) | |
-
+| 2016         | Round 1A       | [A. The Last Word](https://code.google.com/codejam/contest/4304486/dashboard#s=p0)         | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1A/src/main/scala/ProblemA.scala#L32-L41) | |
+| 2016         | Round 1A       | [B. Rank and File](https://code.google.com/codejam/contest/4304486/dashboard#s=p1)         | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1A/src/main/scala/ProblemB.scala#L36-L41) | |
+| 2016         | Round 1A       | [C. BFFs](https://code.google.com/codejam/contest/4304486/dashboard#s=p2)                  | [Live (Scala) - incomplete](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1A/src/main/scala/ProblemC.scala#L38-L52) | Wasted 30 to 45 minutes on an IntelliJ Idea issue (Hint: Right click on src/main/scala, Mark directory as > Sources Root"). Argh! |
 
 # Performance in competition
 
