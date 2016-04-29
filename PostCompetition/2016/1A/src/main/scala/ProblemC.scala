@@ -79,7 +79,38 @@ object ProblemC {
       s"Line(${leftLoopIndex + 1}, ${rightLoopIndex + 1}, left len: $leftLineLength, right len: $rightLineLength)"
   }
 
-  def solve(n: Int, friends: IndexedSeq[Int]): Int = {
+  val solve = solveBoth _
+
+  def solveBoth(n: Int, friends: IndexedSeq[Int]): Int = {
+    val bruteForce = solveByBruteForce(n, friends)
+    val fast = solveFast(n, friends)
+    if (bruteForce != fast) {
+      println("WARNING: brute force and fast solutions differ!")
+    }
+    bruteForce
+  }
+
+  def solveByBruteForce(n: Int, friends: IndexedSeq[Int]): Int = {
+    List.range(n, 1, -1).find { size =>
+      (0 until n).combinations(size).exists { comb =>
+        comb.tail.permutations.map( comb.head +: _).exists { perm =>
+          val isValid = (0 until size).forall { i =>
+            val beforeIndex = (size + i - 1) % size
+            val afterIndex = (i + 1) % size
+            val child = perm(i)
+            val friend = friends(child)
+            perm(beforeIndex) == friend || perm(afterIndex) == friend
+          }
+          if (isValid) {
+            println(s"Size: $size; items: " + perm.map(_+1).mkString(" -> "))
+          }
+          isValid
+        }
+      }
+    }.get  // Okay, since there must be a solution
+  }
+
+  def solveFast(n: Int, friends: IndexedSeq[Int]): Int = {
     val paths = mutable.ArrayBuffer.fill[Path](n)(Unexpanded)
 
     def expandPath(nodeToExpand: Int): Path = {
@@ -98,7 +129,7 @@ object ProblemC {
             PartialCycle(len + 1, startOfCycle, nodeToExpand :: subNodes)
           case Cycle(_) => Invalid
           case Loop(bf) if bf == nodeToExpand => Loop(bestFriend)
-          case Loop(entry) => Lasso(3, entry)
+          case Loop(_) => Lasso(3, bestFriend)
           case Lasso(len, entry) => Lasso(len + 1, entry)
           case Invalid => Invalid
           case Expanding if friends(bestFriend) == nodeToExpand => Loop(bestFriend)
