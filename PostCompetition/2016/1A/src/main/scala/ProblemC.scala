@@ -79,13 +79,15 @@ object ProblemC {
       s"Line(${leftLoopIndex + 1}, ${rightLoopIndex + 1}, left len: $leftLineLength, right len: $rightLineLength)"
   }
 
-  val solve = solveBoth _
+  val solve = solveFast _
 
   def solveBoth(n: Int, friends: IndexedSeq[Int]): Int = {
     val bruteForce = solveByBruteForce(n, friends)
     val fast = solveFast(n, friends)
     if (bruteForce != fast) {
+      println("******")
       println("WARNING: brute force and fast solutions differ!")
+      println()
     }
     bruteForce
   }
@@ -134,7 +136,7 @@ object ProblemC {
           case Invalid => Invalid
           case Expanding if friends(bestFriend) == nodeToExpand => Loop(bestFriend)
           // The other node will get counted on unwinding the stack
-          case Expanding => PartialCycle(1, bestFriend, List.empty)
+          case Expanding => PartialCycle(1, bestFriend, List(nodeToExpand))
           case _ => throw new Exception("Should never occur")
         }
 
