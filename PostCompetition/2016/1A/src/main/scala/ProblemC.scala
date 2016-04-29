@@ -103,7 +103,7 @@ object ProblemC {
       }
     }
 
-    val max = (0 until n).map(expandPath(_).length).max
+    var max = (0 until n).map(expandPath(_).length).max
 
     // There could be two lassos which can be joined together at the common pair to make a longer path:
     val pathsWithIndex = paths.zipWithIndex
@@ -112,25 +112,40 @@ object ProblemC {
         entry -> index
     }
 
-    if (loops.isEmpty) { max } else {
-      // Look for loops
+    if (!loops.isEmpty) {
+      // Find longest lassos for each entry point into a loop:
       val lassoLengthsByEntryPoint = paths.collect {
         case Lasso(len, entry) => entry -> len
       }.groupBy(_._1)
       val maxLassoLengthsByEntryPoint = lassoLengthsByEntryPoint.map {
         case (entry, entryLengths) => entry -> entryLengths.map(_._2).max
-      }.toMap
+      }
       println(s"max lasso lengths by loop entry point: $maxLassoLengthsByEntryPoint")
-      val maxLinesWithMidLoops = for {
+
+      // Two lassos can share a loop if they enter the loop via different members of the loop:
+      val maxLinesWithASharedLoop = for {
         (a, b) <- loops
         if maxLassoLengthsByEntryPoint.contains(a) && maxLassoLengthsByEntryPoint.contains(b)
       } yield maxLassoLengthsByEntryPoint(a) + maxLassoLengthsByEntryPoint(b) - 2
       /* Subtract two, since loop members have been counted twice */
 
-      if (maxLinesWithMidLoops.isEmpty) max else {
-        val maxMidLoop = maxLinesWithMidLoops.max
-        math.max(max, maxMidLoop)
+      if (!maxLinesWithASharedLoop.isEmpty) {
+        val maxMidLoop = maxLinesWithASharedLoop.max
+        max = math.max(max, maxMidLoop)
+      }
+
+      // Two lassos with separate loops can be placed side by side to form a valid circle
+      val maxLassoLengthsByLoop = for {
+        (a, b) <- loops
+      } yield math.max(maxLassoLengthsByEntryPoint.getOrElse(a, 0), maxLassoLengthsByEntryPoint.getOrElse(b, 0))
+      println(s"max lasso lengths by loop: $maxLassoLengthsByLoop")
+
+      if (maxLassoLengthsByLoop.size >= 2) {
+        val maxPairOfLassos = maxLassoLengthsByLoop.sorted(Ordering[Int].reverse).take(2).sum
+        if (maxPairOfLassos > max) { max = maxPairOfLassos }
       }
     }
+
+    max
   }
 }
