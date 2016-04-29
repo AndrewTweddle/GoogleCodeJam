@@ -1,4 +1,5 @@
 import java.io.File
+import java.nio.file.{Files, Paths, StandardCopyOption}
 
 import scala.collection.immutable
 
@@ -13,31 +14,35 @@ object Master {
   //      run D l data
   def main(args: Array[String]): Unit = {
     try {
-      if (args.length < 3) {
-        println("USAGE: command problem size [attempt [inputFolder [outputFolder]]]")
+      if (args.length < 2) {
+        println("USAGE: problem size [attempt [inputFolder [outputFolder]]]")
         println()
-        println("command: run (others to be added later)")
         println("problem: a|b|...")
         println("size: s|small|l|large|t|test|{custom}")
         println("attempt: 0, 1, ... (only relevant for size=small, defaults to 0)")
         println("inputFolder: defaults to data, NB: no trailing slash")
         println("outputFolder: defaults to match inputFolder, NB: no trailing slash")
       } else {
-        val command = args(0).toLowerCase()
-        val problem = args(1).toUpperCase()
-        val sizeCode = args(2).toLowerCase()
+        val problem = args(0).toUpperCase()
+        val sizeCode = args(1).toLowerCase()
         val sizeName = sizeMap.getOrElse(sizeCode, sizeCode)
         val isSmall = sizeName == "small"
-        val inFolderPos = if (isSmall) 4 else 3
-        val attempt = if (isSmall && args.length > 3) args(3).toInt else 0
+        val inFolderPos = if (isSmall) 3 else 2
+        val attempt = if (isSmall && args.length > 2) args(2).toInt else 0
         val inFolderPath = if (args.length > inFolderPos) args(inFolderPos) else "data"
         val outFolderPath = if (args.length > inFolderPos + 1) args(inFolderPos) else inFolderPath
         val attemptSuffix = if (isSmall) s"-attempt$attempt" else ""
         val inFileName = s"$inFolderPath/$problem-$sizeName$attemptSuffix.in"
         val outFileName = s"$outFolderPath/$problem-$sizeName$attemptSuffix.out"
-        command match {
-            case "run" => run(problem, inFileName, outFileName)
-            case _ => throw new IllegalArgumentException(s"Unsupported command: $command")
+        run(problem, inFileName, outFileName)
+
+        // Copy source file for easy upload (only relevant if part of live competition):
+        if (sizeName == "small" || sizeName == "large") {
+          val srcFilePath = Paths.get(s"src/main/scala/Problem$problem.scala")
+          val destSrcFilePath = Paths.get(s"$outFolderPath/Problem${problem}_$sizeName$attemptSuffix.scala")
+          if (Files.exists(srcFilePath)) {
+            Files.copy(srcFilePath, destSrcFilePath, StandardCopyOption.REPLACE_EXISTING)
+          }
         }
       }
     }
@@ -47,7 +52,7 @@ object Master {
 
     def run(problem: String, inFileName: String, outFileName: String): Unit = {
       if (!new File(inFileName).exists()) {
-        println("ERROR: input file does not exist: " + inFileName)
+        throw new IllegalArgumentException(s"ERROR: input file does not exist: $inFileName")
       } else {
         problem match {
           // case "A"  => ProblemA.processFiles(inFileName, outFileName)
