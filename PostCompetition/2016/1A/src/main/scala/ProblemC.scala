@@ -69,6 +69,16 @@ object ProblemC {
     // Used to track status of being on the expansion path.
     // When we follow a path to a node that is already in an Expanding state, we have found a cycle or a loop.
 
+  // The Line class tracks the longest line that can be made with a single loop at its centre or at the end:
+  // NB: All such lines can be strung together to create a valid solution.
+  case class Line(leftLoopIndex: Int, rightLoopIndex: Int, // NB: leftLoopIndex < rightLoopIndex
+                  leftLineLength: Int = 0, rightLineLength: Int = 0) {
+    // NB: The line length excludes the loop (i.e. the two mutual best friends are counted separately)
+    val length = 2 + leftLineLength + rightLineLength
+    override def toString =
+      s"Line(${leftLoopIndex + 1}, ${rightLoopIndex + 1}, left len: $leftLineLength, right len: $rightLineLength)"
+  }
+
   def solve(n: Int, friends: IndexedSeq[Int]): Int = {
     val paths = mutable.ArrayBuffer.fill[Path](n)(Unexpanded)
 
@@ -103,49 +113,32 @@ object ProblemC {
       }
     }
 
-    var max = (0 until n).map(expandPath(_).length).max
+    // Expand the paths, and also track the maximum simple path length (i.e. a cycle, loop or lasso):
+    val maxSimplePathLength = (0 until n).map(expandPath(_).length).max
 
-    // There could be two lassos which can be joined together at the common pair to make a longer path:
-    val pathsWithIndex = paths.zipWithIndex
-    val loops = pathsWithIndex.collect {
-      case (Loop(entry), index) if entry < index => // Only include one of each loop pair
-        entry -> index
-    }
-
-    if (!loops.isEmpty) {
+    def getLongestLassoLineLengthsByEntryPoint() = {
       // Find longest lassos for each entry point into a loop:
       val lassoLengthsByEntryPoint = paths.collect {
-        case Lasso(len, entry) => entry -> len
+        case Lasso(len, entry) => entry -> (len - 2)
       }.groupBy(_._1)
-      val maxLassoLengthsByEntryPoint = lassoLengthsByEntryPoint.map {
+      lassoLengthsByEntryPoint.map {
         case (entry, entryLengths) => entry -> entryLengths.map(_._2).max
-      }
-      println(s"max lasso lengths by loop entry point: $maxLassoLengthsByEntryPoint")
-
-      // Two lassos can share a loop if they enter the loop via different members of the loop:
-      val maxLinesWithASharedLoop = for {
-        (a, b) <- loops
-        if maxLassoLengthsByEntryPoint.contains(a) && maxLassoLengthsByEntryPoint.contains(b)
-      } yield maxLassoLengthsByEntryPoint(a) + maxLassoLengthsByEntryPoint(b) - 2
-      /* Subtract two, since loop members have been counted twice */
-
-      if (!maxLinesWithASharedLoop.isEmpty) {
-        val maxMidLoop = maxLinesWithASharedLoop.max
-        max = math.max(max, maxMidLoop)
-      }
-
-      // Two lassos with separate loops can be placed side by side to form a valid circle
-      val maxLassoLengthsByLoop = for {
-        (a, b) <- loops
-      } yield math.max(maxLassoLengthsByEntryPoint.getOrElse(a, 0), maxLassoLengthsByEntryPoint.getOrElse(b, 0))
-      println(s"max lasso lengths by loop: $maxLassoLengthsByLoop")
-
-      if (maxLassoLengthsByLoop.size >= 2) {
-        val maxPairOfLassos = maxLassoLengthsByLoop.sorted(Ordering[Int].reverse).take(2).sum
-        if (maxPairOfLassos > max) { max = maxPairOfLassos }
       }
     }
 
-    max
+    val maxLineLengthsByEntryPoint = getLongestLassoLineLengthsByEntryPoint()
+    println(s"max lasso line lengths by loop entry point (zero-based): $maxLineLengthsByEntryPoint")
+
+    // There could be pairs of lassos which share a common loop and can be joined together at the common pair:
+    val linesByLeftIndex = paths.zipWithIndex.collect {
+      case (Loop(entry), index) if entry < index =>
+        Line(entry, index,
+          maxLineLengthsByEntryPoint.getOrElse(entry, 0),
+          maxLineLengthsByEntryPoint.getOrElse(index, 0))
+    }
+    println(s"linesByLeftIndex: $linesByLeftIndex")
+
+    val sumOfLineLengths = if (linesByLeftIndex.isEmpty) 0 else linesByLeftIndex.map(_.length).sum
+    math.max(maxSimplePathLength, sumOfLineLengths)
   }
 }
