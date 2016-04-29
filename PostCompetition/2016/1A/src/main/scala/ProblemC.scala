@@ -52,7 +52,9 @@ object ProblemC {
     override def toString = s"Loop(${mutualBestFriend + 1})"
   }
   // A lasso is a path that ends in a loop (a pair of mutual best friends):
-  final case class Lasso(override val length: Int)  extends Path
+  final case class Lasso(override val length: Int, loopEntryPoint: Int) extends Path {
+    override def toString = s"Lasso(length: $length, entryPoint: ${loopEntryPoint + 1})"
+  }
   final case class Cycle(override val length: Int) extends Path
 
   // Temporary states while paths are being expanded...
@@ -86,8 +88,8 @@ object ProblemC {
             PartialCycle(len + 1, startOfCycle, nodeToExpand :: subNodes)
           case Cycle(_) => Invalid
           case Loop(bf) if bf == nodeToExpand => Loop(bestFriend)
-          case Loop(_) => Lasso(3)
-          case Lasso(len) => Lasso(len + 1)
+          case Loop(entry) => Lasso(3, entry)
+          case Lasso(len, entry) => Lasso(len + 1, entry)
           case Invalid => Invalid
           case Expanding if friends(bestFriend) == nodeToExpand => Loop(bestFriend)
           // The other node will get counted on unwinding the stack
@@ -101,6 +103,34 @@ object ProblemC {
       }
     }
 
-    (0 until n).map(expandPath(_).length).max
+    val max = (0 until n).map(expandPath(_).length).max
+
+    // There could be two lassos which can be joined together at the common pair to make a longer path:
+    val pathsWithIndex = paths.zipWithIndex
+    val loops = pathsWithIndex.collect {
+      case (Loop(entry), index) if entry < index => // Only include one of each loop pair
+        entry -> index
+    }
+
+    if (loops.isEmpty) { max } else {
+      // Look for loops
+      val lassoLengthsByEntryPoint = paths.collect {
+        case Lasso(len, entry) => entry -> len
+      }.groupBy(_._1)
+      val maxLassoLengthsByEntryPoint = lassoLengthsByEntryPoint.map {
+        case (entry, entryLengths) => entry -> entryLengths.map(_._2).max
+      }.toMap
+      println(s"max lasso lengths by loop entry point: $maxLassoLengthsByEntryPoint")
+      val maxLinesWithMidLoops = for {
+        (a, b) <- loops
+        if maxLassoLengthsByEntryPoint.contains(a) && maxLassoLengthsByEntryPoint.contains(b)
+      } yield maxLassoLengthsByEntryPoint(a) + maxLassoLengthsByEntryPoint(b) - 2
+      /* Subtract two, since loop members have been counted twice */
+
+      if (maxLinesWithMidLoops.isEmpty) max else {
+        val maxMidLoop = maxLinesWithMidLoops.max
+        math.max(max, maxMidLoop)
+      }
+    }
   }
 }
