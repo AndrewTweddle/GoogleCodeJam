@@ -9,9 +9,9 @@ import scala.collection.immutable
 object Master {
   val sizeMap = immutable.HashMap[String, String]("s" -> "small", "l" -> "large", "t"->"test")
 
-  // e.g. run D s 0
-  //      run D t
-  //      run D l data
+  // e.g. D s 0
+  //      D t
+  //      D l data
   def main(args: Array[String]): Unit = {
     try {
       if (args.length < 2) {
