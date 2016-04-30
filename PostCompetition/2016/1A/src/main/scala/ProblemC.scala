@@ -41,44 +41,6 @@ object ProblemC {
     }
   }
 
-  // Use case classes to define enumerations for each path starting at a particular node:
-  sealed trait Path { def length = 0 }
-
-  // An invalid path leads to a cycle, without being part of the cycle:
-  final case object Invalid extends Path
-  // A loop is a pair of mutual best friends:
-  final case class Loop(mutualBestFriend: Int) extends Path {
-    override val length = 2
-    override def toString = s"Loop(${mutualBestFriend + 1})"
-  }
-  // A lasso is a path that ends in a loop (a pair of mutual best friends):
-  final case class Lasso(override val length: Int, loopEntryPoint: Int) extends Path {
-    override def toString = s"Lasso(length: $length, entryPoint: ${loopEntryPoint + 1})"
-  }
-  final case class Cycle(override val length: Int) extends Path
-
-  // Temporary states while paths are being expanded...
-
-  // A PartialCycle is used to unwind the stack back to "friendAtStartOfCycle":
-  final case class PartialCycle(override val length: Int, friendAtStartOfCyle: Int,
-                                nodesOnCycle: List[Int]) extends Path {
-    override def toString = s"PartialCycle($length, ${friendAtStartOfCyle + 1}, ${nodesOnCycle.map(_ + 1)})"
-  }
-  final case object Unexpanded extends Path
-  final case object Expanding extends Path
-    // Used to track status of being on the expansion path.
-    // When we follow a path to a node that is already in an Expanding state, we have found a cycle or a loop.
-
-  // The Line class tracks the longest line that can be made with a single loop at its centre or at the end:
-  // NB: All such lines can be strung together to create a valid solution.
-  case class Line(leftLoopIndex: Int, rightLoopIndex: Int, // NB: leftLoopIndex < rightLoopIndex
-                  leftLineLength: Int = 0, rightLineLength: Int = 0) {
-    // NB: The line length excludes the loop (i.e. the two mutual best friends are counted separately)
-    val length = 2 + leftLineLength + rightLineLength
-    override def toString =
-      s"Line(${leftLoopIndex + 1}, ${rightLoopIndex + 1}, left len: $leftLineLength, right len: $rightLineLength)"
-  }
-
   val solve = solveFast _
 
   /* Solve both ways to find bugs in the fast solution:
@@ -177,5 +139,43 @@ object ProblemC {
 
     val sumOfLineLengths = if (linesByLeftIndex.isEmpty) 0 else linesByLeftIndex.map(_.length).sum
     math.max(maxSimplePathLength, sumOfLineLengths)
+  }
+
+  // Use case classes to define enumerations for each path starting at a particular node:
+  sealed trait Path { def length = 0 }
+
+  // An invalid path leads to a cycle, without being part of the cycle:
+  final case object Invalid extends Path
+  // A loop is a pair of mutual best friends:
+  final case class Loop(mutualBestFriend: Int) extends Path {
+    override val length = 2
+    override def toString = s"Loop(${mutualBestFriend + 1})"
+  }
+  // A lasso is a path that ends in a loop (a pair of mutual best friends):
+  final case class Lasso(override val length: Int, loopEntryPoint: Int) extends Path {
+    override def toString = s"Lasso(length: $length, entryPoint: ${loopEntryPoint + 1})"
+  }
+  final case class Cycle(override val length: Int) extends Path
+
+  // Temporary states while paths are being expanded...
+
+  // A PartialCycle is used to unwind the stack back to "friendAtStartOfCycle":
+  final case class PartialCycle(override val length: Int, friendAtStartOfCyle: Int,
+                                nodesOnCycle: List[Int]) extends Path {
+    override def toString = s"PartialCycle($length, ${friendAtStartOfCyle + 1}, ${nodesOnCycle.map(_ + 1)})"
+  }
+  final case object Unexpanded extends Path
+  final case object Expanding extends Path
+  // Used to track status of being on the expansion path.
+  // When we follow a path to a node that is already in an Expanding state, we have found a cycle or a loop.
+
+  // The Line class tracks the longest line that can be made with a single loop at its centre or at the end:
+  // NB: All such lines can be strung together to create a valid solution.
+  case class Line(leftLoopIndex: Int, rightLoopIndex: Int, // NB: leftLoopIndex < rightLoopIndex
+                  leftLineLength: Int = 0, rightLineLength: Int = 0) {
+    // NB: The line length excludes the loop (i.e. the two mutual best friends are counted separately)
+    val length = 2 + leftLineLength + rightLineLength
+    override def toString =
+      s"Line(${leftLoopIndex + 1}, ${rightLoopIndex + 1}, left len: $leftLineLength, right len: $rightLineLength)"
   }
 }
