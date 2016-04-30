@@ -81,6 +81,10 @@ object ProblemC {
 
   val solve = solveFast _
 
+  /* Solve both ways to find bugs in the fast solution:
+   * 1. slow but simple
+   * 2. fast but complex
+   */
   def solveBoth(n: Int, friends: IndexedSeq[Int]): Int = {
     val bruteForce = solveByBruteForce(n, friends)
     val fast = solveFast(n, friends)
