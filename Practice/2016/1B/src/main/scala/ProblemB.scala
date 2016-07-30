@@ -53,10 +53,6 @@ object ProblemB {
   def digitToChar(digit: Int): Char = digit.toString()(0)
   def isDigit(digit: Int) = (digit >= 0) && (digit <= 9)
 
-  def getTheBetterSolution(solution1: Solution, solution2: Solution): Solution = {
-    if (solution1 < solution2) solution1 else solution2
-  }
-
   def solve(c: String, j: String): Solution = {
     def expand(candidate: Solution, index: Int): Solution = {
       def relaceAndExpandMany(cjDigits: (Int, Int) *): Solution = {
