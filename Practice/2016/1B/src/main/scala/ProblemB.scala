@@ -55,7 +55,7 @@ object ProblemB {
 
   def solve(c: String, j: String): Solution = {
     def expand(candidate: Solution, index: Int): Solution = {
-      def relaceAndExpandMany(cjDigits: (Int, Int) *): Solution = {
+      def replaceAndExpandMany(cjDigits: (Int, Int) *): Solution = {
         def replaceAndExpand(newCDigit: Int, newJDigit: Int): Solution = {
           val newCStr = candidate.cStr.updated(index, digitToChar(newCDigit))
           val newJStr = candidate.jStr.updated(index, digitToChar(newJDigit))
@@ -81,14 +81,14 @@ object ProblemB {
             val jNext = candidate.jStr(index)
 
             (cNext, jNext) match {
-              case ('?', '?') => relaceAndExpandMany((0, 1), (1, 0), (0, 0))
+              case ('?', '?') => replaceAndExpandMany((0, 1), (1, 0), (0, 0))
 
               case ('?', chToTry) => {
                 val valToTry = charToInt(chToTry)
                 val pairsToTry = Seq(valToTry - 1, valToTry, valToTry + 1)
                   .filter(isDigit)
                   .map((_, valToTry))
-                relaceAndExpandMany(pairsToTry: _*)
+                replaceAndExpandMany(pairsToTry: _*)
               }
 
               case (chToTry, '?') => {
@@ -96,7 +96,7 @@ object ProblemB {
                 val pairsToTry = Seq(valToTry - 1, valToTry, valToTry + 1)
                   .filter(isDigit)
                   .map((valToTry, _))
-                relaceAndExpandMany(pairsToTry: _*)
+                replaceAndExpandMany(pairsToTry: _*)
               }
 
               // If both of next digits are defined, expand one level and call expand again

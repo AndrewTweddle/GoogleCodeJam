@@ -4,7 +4,11 @@
 
 This contains my solutions to various Google CodeJam problems.
 
-Some were solved as part of the live competition. Others were solved for fun or practice outside of the competition setting.
+Some were solved as part of the live competition.
+Others were solved for fun or practice outside of the competition setting.
+
+I sometimes struggle to concentrate under pressure.
+Doing Google CodeJam is a way of working on this.
 
 ## Folder structure
 
@@ -37,16 +41,29 @@ The folder structure is primarily sub-divided by the context in which the proble
 | 2016         | Round 1A       | [B. Rank and File](https://code.google.com/codejam/contest/4304486/dashboard#s=p1)         | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1A/src/main/scala/ProblemB.scala#L36-L41) | |
 | 2016         | Round 1A       | [C. BFFs](https://code.google.com/codejam/contest/4304486/dashboard#s=p2)                  | [Live (Scala) - incomplete](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1A/src/main/scala/ProblemC.scala#L38-L52); Rewrite (Scala): [brute force](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2016/1A/src/main/scala/ProblemC.scala#L61-L79), [fast](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2016/1A/src/main/scala/ProblemC.scala#L81-L180) |  |
 | 2016         | Round 1C       | [C. Fashion police](https://code.google.com/codejam/contest/4314486/dashboard#s=p2) | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1C/src/main/scala/ProblemC.scala#L45-L53) | Logged in an hour late, not planning to participate, but gave in to temptation. Submitted successful large solution in the final minute! |
+| 2016         | Round 1B       | [B. Close match](https://code.google.com/codejam/contest/11254486/dashboard#s=p1) | [Practice (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Practice/2016/1B/src/main/scala/ProblemB.scala#L34-L117) | Quite tricky - is there a simpler solution? |
 
 # Performance in competition
 
-| Competition                                         |
-| ---                                                 |
-| [2014](http://www.go-hero.net/jam/14/name/atweddle) |
+| Competition                                                |
+| ---                                                        |
+| [2014](http://www.go-hero.net/jam/14/name/atweddle)        |
+| [2016](https://www.go-hero.net/jam/16/name/Andrew.Tweddle) |
+
+# Learnings
+
+## 2016 Round 1 experiences:
+
+In round 1A I did quite well, despite losing the first 30 or 40 minutes to an IDE setup issue.
+In round 1C I logged in an hour late, still had to set up my projects and narrowly missed making round 2.
+In round 1B I was well prepared, could see in principle how to solve each of the 3 problems, but struggled to coordinate my thoughts and bombed out miserably.
+
+_Conclusion: I do much better when I am on the back foot and have reduced expectations of myself. Am I undermining myself by placing too much pressure on myself?_
 
 # Other items of interest
 
 In 2014 I used a deep folder structure for problems and their data.
+
 In the 2016 qualification round, I used a single data folder for the entire round.
 I also added a [Master.scala](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/Qualification/src/main/scala/Master.scala) file to make it easier to switch between problems and test files.
 This takes command line arguments for things like:
@@ -54,10 +71,10 @@ This takes command line arguments for things like:
   * problem size (s=small, l=large, t=test or a custom name)
   * attempt number (small attempts only, defaulting to zero) 
 It generates input and output file names from these arguments and calls the appropriate solution.
+If applicable, it also copies a snapshot of the ProblemX.scala source file to the data folder for easy uploading.
 
 # Future work
 
-* Modify Master.scala to move the relevant ProblemX.scala file into the data folder, renaming it to ProblemX_{size}.scala, for easier uploading.
 * Move Master.scala and ProblemX.scala template files into a templates folder
 * Make polyglot programming easier: Write similar master files for other languages (sharing the same maven/sbt folder layout including the shared data folder)
 * Make it easier to do unit testing
