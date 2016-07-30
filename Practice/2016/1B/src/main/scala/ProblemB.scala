@@ -51,83 +51,65 @@ object ProblemB {
   }
   def charToInt(ch: Char): Int = ("" + ch).toInt
   def digitToChar(digit: Int): Char = digit.toString()(0)
+  def isDigit(digit: Int) = (digit >= 0) && (digit <= 9)
 
   def getTheBetterSolution(solution1: Solution, solution2: Solution): Solution = {
     if (solution1 < solution2) solution1 else solution2
   }
 
   def solve(c: String, j: String): Solution = {
-    def replaceAndExpand(candidate: Solution, index: Int, newCChar: Char, newJChar: Char): Solution = {
-      val newCStr = candidate.cStr.updated(index, newCChar)
-      val newJStr = candidate.jStr.updated(index, newJChar)
-      val newC = candidate.c * 10 + charToInt(newCChar)
-      val newJ = candidate.j * 10 + charToInt(newJChar)
-      expand(Solution(newC, newJ, newCStr, newJStr), index + 1)
-    }
+    def expand(candidate: Solution, index: Int): Solution = {
+      def relaceAndExpandMany(cjDigits: (Int, Int) *): Solution = {
+        def replaceAndExpand(newCDigit: Int, newJDigit: Int): Solution = {
+          val newCStr = candidate.cStr.updated(index, digitToChar(newCDigit))
+          val newJStr = candidate.jStr.updated(index, digitToChar(newJDigit))
+          val newC = candidate.c * 10 + newCDigit
+          val newJ = candidate.j * 10 + newJDigit
+          expand(Solution(newC, newJ, newCStr, newJStr), index + 1)
+        }
+        val newCandidates = cjDigits.map(cj => replaceAndExpand(cj._1, cj._2))
+        newCandidates.sorted.head
+      }
 
-    def expand(candidate: Solution, index: Int): Solution = candidate match {
-      // if intermediate c > j, make final c as small as possible and final j as large as possible:
-      case Solution(c, j, _, _) if c > j => candidate.replaceAllQuMarks('0', '9')
+      candidate match {
+        // if intermediate c > j, make final c as small as possible and final j as large as possible:
+        case Solution(c, j, _, _) if c > j => candidate.replaceAllQuMarks('0', '9')
 
-      // if intermediate c < j, make final c as large as possible and final j as small as possible:
-      case Solution(c, j, _, _) if c < j => candidate.replaceAllQuMarks('9', '0')
+        // if intermediate c < j, make final c as large as possible and final j as small as possible:
+        case Solution(c, j, _, _) if c < j => candidate.replaceAllQuMarks('9', '0')
 
-      // if intermediate c == j, expand the next character in each string:
-      case _ => {
-        if (candidate.cStr.length == index) { candidate } else {
-          val cNext = candidate.cStr(index)
-          val jNext = candidate.jStr(index)
+        // if intermediate c == j, expand the next character in each string:
+        case _ => {
+          if (candidate.cStr.length == index) { candidate } else {
+            val cNext = candidate.cStr(index)
+            val jNext = candidate.jStr(index)
 
-          (cNext, jNext) match {
-            case ('?', '?') => {
-              // If both of next digits are undefined, set to zero, and call expand again
-              replaceAndExpand(candidate, index, '0', '0')
-            }
+            (cNext, jNext) match {
+              case ('?', '?') => relaceAndExpandMany((0, 1), (1, 0), (0, 0))
 
-            case ('?', chToTry) => {
-              // Keep them even:
-              val valToTry = charToInt(chToTry)
-              var bestSolution = replaceAndExpand(candidate, index, chToTry, chToTry)
-
-              // Try higher:
-              if (valToTry != 9) {
-                val possibleSolution = replaceAndExpand(candidate, index, digitToChar(valToTry + 1), chToTry)
-                bestSolution = getTheBetterSolution(bestSolution, possibleSolution)
+              case ('?', chToTry) => {
+                val valToTry = charToInt(chToTry)
+                val pairsToTry = Seq(valToTry - 1, valToTry, valToTry + 1)
+                  .filter(isDigit)
+                  .map((_, valToTry))
+                relaceAndExpandMany(pairsToTry: _*)
               }
 
-              // Try lower:
-              if (valToTry != 0) {
-                val possibleSolution = replaceAndExpand(candidate, index, digitToChar(valToTry - 1), chToTry)
-                bestSolution = getTheBetterSolution(bestSolution, possibleSolution)
-              }
-              bestSolution
-            }
-
-            case (chToTry, '?') => {
-              // Keep them even:
-              val valToTry = charToInt(chToTry)
-              var bestSolution = replaceAndExpand(candidate, index, chToTry, chToTry)
-
-              // Try higher:
-              if (valToTry != 9) {
-                val possibleSolution = replaceAndExpand(candidate, index, chToTry, digitToChar(valToTry + 1))
-                bestSolution = getTheBetterSolution(bestSolution, possibleSolution)
+              case (chToTry, '?') => {
+                val valToTry = charToInt(chToTry)
+                val pairsToTry = Seq(valToTry - 1, valToTry, valToTry + 1)
+                  .filter(isDigit)
+                  .map((valToTry, _))
+                relaceAndExpandMany(pairsToTry: _*)
               }
 
-              // Try lower:
-              if (valToTry != 0) {
-                val possibleSolution = replaceAndExpand(candidate, index, chToTry, digitToChar(valToTry - 1))
-                bestSolution = getTheBetterSolution(bestSolution, possibleSolution)
+              // If both of next digits are defined, expand one level and call expand again
+              case _ => {
+                val cDigit = charToInt(cNext)
+                val jDigit = charToInt(jNext)
+                val newCandidate = candidate.copy(c = candidate.c * 10 + cDigit, j = candidate.j * 10 + jDigit )
+                expand(newCandidate, index + 1)
               }
-              bestSolution
-            }
-
-            // If both of next digits are defined, expand one level and call expand again
-            case _ => {
-              val cDigit = charToInt(cNext)
-              val jDigit = charToInt(jNext)
-              val newCandidate = candidate.copy(c = candidate.c * 10 + cDigit, j = candidate.j * 10 + jDigit )
-              expand(newCandidate, index + 1)
             }
           }
         }
