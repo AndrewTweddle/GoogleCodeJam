@@ -3,31 +3,43 @@ import java.io._
 import scala.math.Ordered.orderingToOrdered
 
 object ProblemB {
-  def main(args: Array[String]): Unit = {
-    processFiles(args(0), args(1))
-  }
+  def main(args: Array[String]): Unit = if (args.length >= 2) processFiles(args(0), args(1)) else processStdInOut()
 
   def processFiles(inputFilePath: String, outputFilePath: String): Unit = {
     val bufferedSource = Source.fromFile(inputFilePath)
     try {
-      val lines = bufferedSource.getLines()
       val outputFile = new File(outputFilePath)
       val bw = new BufferedWriter(new FileWriter(outputFile))
-      try {
-        val testCaseCount = lines.next.toInt
-        for (testCase <- 1 to testCaseCount) {
-          val line = lines.next()
-          val strings = line.split(" ")
-          val sol = solve(strings(0), strings(1))
-          bw.write(s"Case #$testCase: ${sol.cStr} ${sol.jStr}")
-          bw.newLine()
-        }
-      } finally {
-        bw.flush()
-        bw.close()
-      }
+      process(bufferedSource, bw);
     } finally {
       bufferedSource.close()
+    }
+  }
+
+  def processStdInOut(): Unit = {
+    val src = io.Source.fromInputStream(System.in)
+    try {
+      val bw = new BufferedWriter(new OutputStreamWriter(System.out))
+      process(src, bw);
+    } finally {
+      src.close()
+    }
+  }
+
+  def process(src: Source, bw: BufferedWriter): Unit = {
+    try {
+      val lines = src.getLines()
+      val testCaseCount = lines.next.toInt
+      for (testCase <- 1 to testCaseCount) {
+        val line = lines.next()
+        val strings = line.split(" ")
+        val sol = solve(strings(0), strings(1))
+        bw.write(s"Case #$testCase: ${sol.cStr} ${sol.jStr}")
+        bw.newLine()
+      }
+    } finally {
+      bw.flush()
+      bw.close()
     }
   }
 

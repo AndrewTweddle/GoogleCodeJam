@@ -22,6 +22,17 @@ object Master {
         println("attempt: 0, 1, ... (only relevant for size=small, defaults to 0)")
         println("inputFolder: defaults to data, NB: no trailing slash")
         println("outputFolder: defaults to match inputFolder, NB: no trailing slash")
+        println()
+        println("Choose a problem to solve interactively or press ENTER to exit:")
+        println()
+        val problem = io.StdIn.readLine().toUpperCase()
+        if (problem.isEmpty) {
+          println("Exiting...");
+        } else {
+          println()
+          println("Type inputs below:")
+          runInteractively(problem)
+        }
       } else {
         val problem = args(0).toUpperCase()
         val sizeCode = args(1).toLowerCase()
@@ -61,6 +72,14 @@ object Master {
           case _ => throw new IllegalArgumentException(s"Unsupported problem: $problem")
         }
       }
+    }
+
+    def runInteractively(problem: String): Unit = problem match {
+      // case "A" => ProblemA.processStdInOut()
+      case "B" => ProblemB.processStdInOut()
+      // case "C" => ProblemC.processStdInOut()
+      // case "D" => ProblemD.processStdInOut()
+      case _ => throw new IllegalArgumentException(s"Unsupported problem: $problem")
     }
   }
 }
