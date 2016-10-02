@@ -3,7 +3,11 @@ import java.io._
 import scala.math.Ordered.orderingToOrdered
 
 object ProblemB {
-  def main(args: Array[String]): Unit = if (args.length >= 2) processFiles(args(0), args(1)) else processStdInOut()
+  def main(args: Array[String]): Unit = args.length match {
+    case 0 => processStdInOut()
+    case 1 => processStreams(Source.fromFile(args(0)), new OutputStreamWriter(System.out))
+    case _ => processFiles(args(0), args(1))
+  }
 
   def processFiles(inputFilePath: String, outputFilePath: String): Unit = {
     val outputFile = new File(outputFilePath)
@@ -28,18 +32,22 @@ object ProblemB {
     }
   }
 
-  // Common code is above, problem-specific code is below:
-
   def process(src: Source, bw: BufferedWriter): Unit = {
     val lines = src.getLines()
     val testCaseCount = lines.next.toInt
     for (testCase <- 1 to testCaseCount) {
-      val line = lines.next()
-      val strings = line.split(" ")
-      val sol = solve(strings(0), strings(1))
-      bw.write(s"Case #$testCase: ${sol.cStr} ${sol.jStr}")
-      bw.newLine()
+      processTestCase(testCase, lines, bw);
     }
+  }
+
+  // Common code is above, problem-specific code is below:
+
+  def processTestCase(testCase: Int, lines: Iterator[String], bw: BufferedWriter): Unit = {
+    val line = lines.next()
+    val strings = line.split(" ")
+    val sol = solve(strings(0), strings(1))
+    bw.write(s"Case #$testCase: ${sol.cStr} ${sol.jStr}")
+    bw.newLine()
   }
 
   case class Solution(val c: Long, val j: Long, cStr: String, jStr: String) extends Ordered[Solution] {

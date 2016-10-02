@@ -41,7 +41,7 @@ The folder structure is primarily sub-divided by the context in which the proble
 | 2016         | Round 1A       | [B. Rank and File](https://code.google.com/codejam/contest/4304486/dashboard#s=p1)         | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1A/src/main/scala/ProblemB.scala#L36-L41) | |
 | 2016         | Round 1A       | [C. BFFs](https://code.google.com/codejam/contest/4304486/dashboard#s=p2)                  | [Live (Scala) - incomplete](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1A/src/main/scala/ProblemC.scala#L38-L52); Rewrite (Scala): [brute force](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2016/1A/src/main/scala/ProblemC.scala#L61-L79), [fast](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2016/1A/src/main/scala/ProblemC.scala#L81-L180) |  |
 | 2016         | Round 1C       | [C. Fashion police](https://code.google.com/codejam/contest/4314486/dashboard#s=p2) | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1C/src/main/scala/ProblemC.scala#L45-L53) | Logged in an hour late, not planning to participate, but gave in to temptation. Submitted successful large solution in the final minute! |
-| 2016         | Round 1B       | [B. Close match](https://code.google.com/codejam/contest/11254486/dashboard#s=p1) | [Practice (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Practice/2016/1B/src/main/scala/ProblemB.scala#L45-L128) | Quite tricky - is there a simpler solution? |
+| 2016         | Round 1B       | [B. Close match](https://code.google.com/codejam/contest/11254486/dashboard#s=p1) | [Practice (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Practice/2016/1B/src/main/scala/ProblemB.scala#L41-L132) | Quite tricky - is there a simpler solution? |
 
 # Performance in competition
 
@@ -72,6 +72,16 @@ This takes command line arguments for things like:
   * attempt number (small attempts only, defaulting to zero) 
 It generates input and output file names from these arguments and calls the appropriate solution.
 If applicable, it also copies a snapshot of the ProblemX.scala source file to the data folder for easy uploading.
+
+Additionally, if called with no arguments, then there is an option to enter the problem. 
+If there are zero or one arguments, then the inputs will be read from the standard input stream.
+In both cases the results will be written to the standard output stream.
+
+This gives greater flexibility for participating in other coding competitions, such as CodeForces, which use the standard input and output streams.
+
+# A sample problem file
+
+A sample problem file can be found [here](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Practice/2016/1B/src/main/scala/ProblemB.scala#L1-L41).
 
 # Future work
 

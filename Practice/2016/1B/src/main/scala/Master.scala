@@ -15,23 +15,29 @@ object Master {
   def main(args: Array[String]): Unit = {
     try {
       if (args.length < 2) {
-        println("USAGE: problem size [attempt [inputFolder [outputFolder]]]")
-        println()
-        println("problem: a|b|...")
-        println("size: s|small|l|large|t|test|{custom}")
-        println("attempt: 0, 1, ... (only relevant for size=small, defaults to 0)")
-        println("inputFolder: defaults to data, NB: no trailing slash")
-        println("outputFolder: defaults to match inputFolder, NB: no trailing slash")
-        println()
-        println("Choose a problem to solve interactively or press ENTER to exit:")
-        println()
-        val problem = io.StdIn.readLine().toUpperCase()
+        val problem = if (args.length == 1) args(0).toUpperCase() else {
+          println("USAGE: problem size [attempt [inputFolder [outputFolder]]]")
+          println()
+          println("problem: a|b|...")
+          println("size: s|small|l|large|t|test|{custom}")
+          println("attempt: 0, 1, ... (only relevant for size=small, defaults to 0)")
+          println("inputFolder: defaults to data, NB: no trailing slash")
+          println("outputFolder: defaults to match inputFolder, NB: no trailing slash")
+          println()
+          println("Choose a problem to solve interactively or press ENTER to exit:")
+          println()
+          io.StdIn.readLine().toUpperCase()
+        }
         if (problem.isEmpty) {
+          println("No problem selected.");
+          println();
           println("Exiting...");
         } else {
           println()
-          println("Type inputs below:")
+          println(s"Read problem $problem from stdin (or type inputs below):")
           runInteractively(problem)
+          println()
+          println("DONE!")
         }
       } else {
         val problem = args(0).toUpperCase()
@@ -46,13 +52,17 @@ object Master {
         val inFileName = s"$inFolderPath/$problem-$sizeName$attemptSuffix.in"
         val outFileName = s"$outFolderPath/$problem-$sizeName$attemptSuffix.out"
         run(problem, inFileName, outFileName)
+        println()
+        println("DONE!")
 
         // Copy source file for easy upload (only relevant if part of live competition):
         if (sizeName == "small" || sizeName == "large") {
           val srcFilePath = Paths.get(s"src/main/scala/Problem$problem.scala")
-          val destSrcFilePath = Paths.get(s"$outFolderPath/Problem${problem}_$sizeName$attemptSuffix.scala")
+          val destFilePath = Paths.get(s"$outFolderPath/Problem${problem}_$sizeName$attemptSuffix.scala")
           if (Files.exists(srcFilePath)) {
-            Files.copy(srcFilePath, destSrcFilePath, StandardCopyOption.REPLACE_EXISTING)
+            Files.copy(srcFilePath, destFilePath, StandardCopyOption.REPLACE_EXISTING)
+            println()
+            println(s"Copied $srcFilePath to $destFilePath")
           }
         }
       }
@@ -65,21 +75,23 @@ object Master {
       if (!new File(inFileName).exists()) {
         throw new IllegalArgumentException(s"ERROR: input file does not exist: $inFileName")
       } else {
-        problem match {
-          // case "A"  => ProblemA.processFiles(inFileName, outFileName)
-          case "B" => ProblemB.processFiles(inFileName, outFileName)
-          // case "C" => ProblemC.processFiles(inFileName, outFileName)
-          case _ => throw new IllegalArgumentException(s"Unsupported problem: $problem")
-        }
+        getProblem(problem).processFiles(inFileName, outFileName)
       }
     }
 
-    def runInteractively(problem: String): Unit = problem match {
-      // case "A" => ProblemA.processStdInOut()
-      case "B" => ProblemB.processStdInOut()
-      // case "C" => ProblemC.processStdInOut()
-      // case "D" => ProblemD.processStdInOut()
-      case _ => throw new IllegalArgumentException(s"Unsupported problem: $problem")
+    def runInteractively(problem: String): Unit = getProblem(problem).processStdInOut()
+
+    // To customize, enable relevant problem objects below...
+
+    def getProblem(problem: String):
+      { def processStdInOut(): Unit; def processFiles(inFileName: String, outFileName: String): Unit } = {
+        problem match {
+          // case "A" => ProblemA
+          case "B" => ProblemB
+          // case "C" => ProblemC
+          // case "D" => ProblemD
+          case _ => throw new IllegalArgumentException(s"Unsupported problem: $problem")
+        }
     }
   }
 }
