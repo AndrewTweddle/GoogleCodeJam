@@ -42,13 +42,20 @@ The folder structure is primarily sub-divided by the context in which the proble
 | 2016         | Round 1A       | [C. BFFs](https://code.google.com/codejam/contest/4304486/dashboard#s=p2)                  | [Live (Scala) - incomplete](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1A/src/main/scala/ProblemC.scala#L38-L52); Rewrite (Scala): [brute force](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2016/1A/src/main/scala/ProblemC.scala#L61-L79), [fast](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/PostCompetition/2016/1A/src/main/scala/ProblemC.scala#L81-L180) |  |
 | 2016         | Round 1C       | [C. Fashion police](https://code.google.com/codejam/contest/4314486/dashboard#s=p2) | [Live (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2016/1C/src/main/scala/ProblemC.scala#L45-L53) | Logged in an hour late, not planning to participate, but gave in to temptation. Submitted successful large solution in the final minute! |
 | 2016         | Round 1B       | [B. Close match](https://code.google.com/codejam/contest/11254486/dashboard#s=p1) | [Practice (Scala)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Practice/2016/1B/src/main/scala/ProblemB.scala#L45-L136) | Quite tricky - is there a simpler solution? |
+| 2020         | Qualification  | [Nesting Depth](https://codingcompetitions.withgoogle.com/codejam/round/000000000019fd27/0000000000209a9f) | [Live (Python)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2020/Qualification/NestingDepth/Solution.py)| |
+| 2020         | Qualification  | [Parenting Partnering Returns](https://codingcompetitions.withgoogle.com/codejam/round/000000000019fd27/000000000020bdf9) | [Live (C#)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2020/Qualification/ParentPartneringReturns/AndrewTweddle.GCJ2020.ParentPartneringReturns/Solution.cs)| |
+| 2020         | Qualification  | [ESAb ATAd](https://codingcompetitions.withgoogle.com/codejam/round/000000000019fd27/0000000000209a9e) | [Live (C++)](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2020/Qualification/ESAbATAd/Cpp/Solution.cc)| |
+| 2020         | Qualification  | [Indicium](https://codingcompetitions.withgoogle.com/codejam/round/000000000019fd27/0000000000209aa0) | [Live (Scala) - Incorrect](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Live/2020/Qualification/Indicium/Scala/src/main/scala/Solution.scala)| |
+ 
 
 # Performance in competition
 
-| Competition                                                |
-| ---                                                        |
-| [2014](http://www.go-hero.net/jam/14/name/atweddle)        |
-| [2016](https://www.go-hero.net/jam/16/name/Andrew.Tweddle) |
+| Competition                                                | Results |
+| ---                                                        | ---     |
+| [2014](http://www.go-hero.net/jam/14/name/atweddle)        | Qualified for round 1. Failed to reach round 2. |
+| [2016](https://www.go-hero.net/jam/16/name/Andrew.Tweddle) | Qualified for round 1. Failed to reach round 2. |
+| 2020                                                       | Qualified for round 1. |
+
 
 # Learnings
 
@@ -79,12 +86,8 @@ In both cases the results will be written to the standard output stream.
 
 This gives greater flexibility for participating in other coding competitions, such as CodeForces, which use the standard input and output streams.
 
+The Google CodeJam format changed sometime between 2017 and 2020. So these templates are no longer applicable. 
+
 # A sample problem file
 
-A sample problem file can be found [here](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Practice/2016/1B/src/main/scala/ProblemB.scala#L1-L41).
-
-# Future work
-
-* Move Master.scala and ProblemX.scala template files into a templates folder
-* Make polyglot programming easier: Write similar master files for other languages (sharing the same maven/sbt folder layout including the shared data folder)
-* Make it easier to do unit testing
+A sample problem file for Scala solutions can be found [here](https://github.com/AndrewTweddle/GoogleCodeJam/blob/master/Practice/2016/1B/src/main/scala/ProblemB.scala#L1-L41). This is only applicable to the older competition format.
